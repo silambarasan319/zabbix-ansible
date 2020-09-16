@@ -1,0 +1,75 @@
+---
+ - name: "Check if zabbix is installed"
+   package_facts:
+     manager: "auto"
+
+ - name: "Zabbix-agent test result"
+   debug:
+     msg: "zabbix-agent found"
+   when: "'zabbix-agent' in ansible_facts.packages"
+   
+ - name: Load repository of Zabbix-Agent "{{ zbx_agent_version }}"
+   yum: 
+     name: "{{ repo_link_centos }}"
+   when: "'zabbix-agent' not in ansible_facts.packages"
+   register: output_file
+
+ - name: Check whether Zabbix RPM Installed 
+   debug:
+     msg: "{{ output_file }}"
+
+ - name: Installting Zabbix-Agent "{{ zbx_agent_version }}"
+   yum: 
+     name: zabbix-agent 
+     state: latest
+   when: "'zabbix-agent' not in ansible_facts.packages"
+
+ - name: Create Agent Server
+   lineinfile:
+     dest: /etc/zabbix/zabbix_agentd.conf
+     regexp: ^Server=.*
+     insertafter: ^# Server=
+     line: Server={{ zabbix_servername }}
+   when: "'zabbix-agent' not in ansible_facts.packages"
+
+ - name: Create Agent Server Active
+   lineinfile:
+     dest: /etc/zabbix/zabbix_agentd.conf
+     regexp: ^ServerActive=.*
+     insertafter: ^# ServerActive=
+     line: ServerActive={{ zabbix_servername }}
+   when: "'zabbix-agent' not in ansible_facts.packages"
+
+ - name: Replace Hostname
+   lineinfile:
+     dest: /etc/zabbix/zabbix_agentd.conf
+     regexp: ^Hostname=.*
+     insertafter: ^# Hostname=
+     line: Hostname={{ ansible_fqdn }}
+   when: "'zabbix-agent' not in ansible_facts.packages"
+
+ - name: HostMetadataItem Value For Autoregistor
+   lineinfile:
+     dest: /etc/zabbix/zabbix_agentd.conf
+     regexp: ^# HostMetadataItem=.*
+     insertafter: ^# Default
+     line: HostMetadataItem=system.uname
+   when: "'zabbix-agent' not in ansible_facts.packages"
+
+ - name: Copy systemctl.conf file Server to Host 
+   copy:
+     src: centos/systemctl.conf
+     dest: /etc/zabbix/zabbix_agentd.d/
+   when: "'zabbix-agent' not in ansible_facts.packages"
+
+ - name: Enable Zabbix-Agent
+   service: name=zabbix-agent enabled=yes
+   when: "'zabbix-agent' not in ansible_facts.packages"
+
+ - name: Start Service Zabbix-Agent
+   service: name=zabbix-agent state=started
+   when: "'zabbix-agent' not in ansible_facts.packages"
+ 
+ - name: Restart the Zabbix-Agent Service
+   service: name=zabbix-agent state=restarted
+   when: "'zabbix-agent' in ansible_facts.packages"

@@ -1,0 +1,29 @@
+---
+# tasks file for roles/zabbix
+- name: CentOS distributions
+  include_tasks: centos/centos.yml
+  when:
+    - ansible_distribution == 'CentOS'
+  tags:
+  - centos
+
+- name: Ubuntu distributions
+  include_tasks: ubuntu/ubuntu.yml
+  when:
+    - ansible_distribution == 'Ubuntu'
+  tags:
+  - ubuntu
+
+- name: Debian distributions
+  include_tasks: debian/debian.yml
+  when:
+    - ansible_distribution == 'Debian'
+  tags:
+  - debian
+
+- name: Windows distributions
+  include_tasks: windows/windows.yml
+  when:
+    - ansible_os_family == "Windows"
+  tags: 
+  - windows 

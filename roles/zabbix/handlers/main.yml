@@ -1,0 +1,29 @@
+---
+# handlers file for roles/zabbix
+
+- name: restart win zabbix agent
+  win_service:
+    name: "{{ zabbix_win_agent_service }}"
+    state: restarted
+    enabled: yes
+  when:
+    - ansible_os_family == "Windows"
+
+- name: restart_centos_zabbix_agent
+  service: 
+    name: zabbix-agent
+    state: restarted
+    enabled: yes
+  when: 
+  - ansible_os_family == "RedHat"
+
+- name: restart_ubuntu_zabbix_agent
+  service:
+    name: zabbix-agent
+    state: restarted
+    enabled: yes
+  when:
+  - ansible_distribution == "Ubuntu"
+
+
+

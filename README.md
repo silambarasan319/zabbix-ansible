@@ -1,2 +1,2 @@
 # zabbix-ansible
-Zabbix-agent 5 Installation on CentOS, Debion, Ubuntu and Windows
+Zabbix-agent 5 Installation on CentOS, Debian, Ubuntu and Windows
